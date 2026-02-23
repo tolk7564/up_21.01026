@@ -53,13 +53,38 @@
         </div>
     </section>
 
-    <!-- Покупка билета -->
+    <!-- Покупка билета (ТЕПЕРЬ КАК ФОРМА) -->
     <section id="ticket">
         <h2 class="section-title">Купить <span>билет</span></h2>
         <div class="form">
             <h3 class="form-title">Вход на каток</h3>
-            <div style="font-size: 32px; color: var(--primary); text-align: center; margin-bottom: 20px;">300 ₽</div>
-            <button class="btn btn-primary btn-large" style="width: 100%;">Оплатить вход</button>
+            <form action="{{ route('ticket.store') }}" method="POST">
+                @csrf
+
+                <!-- ФИО -->
+                <div class="form-group">
+                    <label class="form-label">ФИО *</label>
+                    <input type="text" name="full_name" class="form-input" value="{{ old('full_name') }}" placeholder="Иванов Иван Иванович" required>
+                </div>
+
+                <!-- Телефон с маской -->
+                <div class="form-group">
+                    <label class="form-label">Телефон *</label>
+                    <input type="tel" name="phone" id="phoneTicket" class="form-input" value="{{ old('phone') }}" placeholder="+7 (___) ___-__-__" maxlength="18" required>
+                </div>
+
+                <!-- Стоимость (нередактируемая) -->
+                <div class="form-group">
+                    <label class="form-label">Стоимость</label>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--primary);">300 ₽</div>
+                    <input type="hidden" name="price" value="300">
+                </div>
+
+                <!-- Кнопка отправки -->
+                <button type="submit" class="btn btn-primary btn-large" style="width: 100%; margin-top: 20px;">
+                    Оплатить вход
+                </button>
+            </form>
         </div>
     </section>
 
@@ -79,7 +104,7 @@
                 <!-- Телефон с маской -->
                 <div class="form-group">
                     <label class="form-label">Телефон *</label>
-                    <input type="tel" name="phone" id="phone" class="form-input" value="{{ old('phone') }}" placeholder="+7 (___) ___-__-__" maxlength="18" required>
+                    <input type="tel" name="phone" id="phoneBooking" class="form-input" value="{{ old('phone') }}" placeholder="+7 (___) ___-__-__" maxlength="18" required>
                 </div>
 
                 <!-- Часы аренды -->
@@ -153,45 +178,42 @@
 
 <!-- Простые скрипты -->
 <script>
-    // 1. Маска для телефона (работает просто и надежно)
-    const phoneInput = document.getElementById('phone');
+    // Маска для телефона (для обеих форм)
+    function setupPhoneMask(inputId) {
+        const phoneInput = document.getElementById(inputId);
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let numbers = this.value.replace(/\D/g, '');
+                if (numbers.length > 0 && numbers[0] !== '7') {
+                    numbers = '7' + numbers;
+                }
+                if (numbers.length > 11) {
+                    numbers = numbers.slice(0, 11);
+                }
 
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            // Удаляем все кроме цифр
-            let numbers = this.value.replace(/\D/g, '');
-
-            // Если первая цифра не 7, добавляем 7
-            if (numbers.length > 0 && numbers[0] !== '7') {
-                numbers = '7' + numbers;
-            }
-
-            // Ограничиваем длину
-            if (numbers.length > 11) {
-                numbers = numbers.slice(0, 11);
-            }
-
-            // Форматируем
-            let result = '+7';
-
-            if (numbers.length > 1) {
-                result += ' (' + numbers.slice(1, 4);
-            }
-            if (numbers.length >= 5) {
-                result += ') ' + numbers.slice(4, 7);
-            }
-            if (numbers.length >= 8) {
-                result += '-' + numbers.slice(7, 9);
-            }
-            if (numbers.length >= 10) {
-                result += '-' + numbers.slice(9, 11);
-            }
-
-            this.value = result;
-        });
+                let result = '+7';
+                if (numbers.length > 1) {
+                    result += ' (' + numbers.slice(1, 4);
+                }
+                if (numbers.length >= 5) {
+                    result += ') ' + numbers.slice(4, 7);
+                }
+                if (numbers.length >= 8) {
+                    result += '-' + numbers.slice(7, 9);
+                }
+                if (numbers.length >= 10) {
+                    result += '-' + numbers.slice(9, 11);
+                }
+                this.value = result;
+            });
+        }
     }
 
-    // 2. Показать/скрыть блок с коньками
+    // Запускаем маску для обоих полей
+    setupPhoneMask('phoneTicket');
+    setupPhoneMask('phoneBooking');
+
+    // Показать/скрыть блок с коньками
     document.getElementById('withSkates')?.addEventListener('change', function() {
         document.getElementById('skatesBlock').style.display = this.checked ? 'block' : 'none';
     });
