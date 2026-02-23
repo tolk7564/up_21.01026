@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('skates', function (Blueprint $table) {
+        Schema::create('skate_sizes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('brand')->nullable();
+            $table->foreignId('skate_id')->constrained()->onDelete('cascade');
             $table->integer('size');
             $table->integer('quantity')->default(0);
-            $table->decimal('price', 8, 2)->nullable();
-            $table->text('description')->nullable();
             $table->timestamps();
-            $table->timestamps();
+
+            $table->unique(['skate_id', 'size']);
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('skates');
+        Schema::dropIfExists('skate_sizes');
     }
 };
