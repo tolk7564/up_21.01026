@@ -30,6 +30,10 @@ use MoonShine\UI\Components\{Breadcrumbs,
     Layout\TopBar,
     Layout\Wrapper,
     When};
+use App\MoonShine\Resources\SkateResource;
+use MoonShine\MenuManager\MenuItem;
+use App\MoonShine\Resources\SkateSizeResource;
+use App\MoonShine\Resources\BookingResource;
 
 final class MoonShineLayout extends AppLayout
 {
@@ -44,6 +48,9 @@ final class MoonShineLayout extends AppLayout
     {
         return [
             ...parent::menu(),
+            MenuItem::make('Skates', SkateResource::class),
+            MenuItem::make('SkateSizes', SkateSizeResource::class),
+            MenuItem::make('Bookings', BookingResource::class),
         ];
     }
 
